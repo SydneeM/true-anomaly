@@ -1,8 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import Map from './components/Map';
+import { getLatLngObj } from 'tle.js';
 
 const REFRESH_TIME_MS = 10000
+
+interface SatApiInfo {
+  id: number;
+  name: string;
+  tle: string;
+}
 
 interface CoordInfo {
   lat: number;
@@ -29,7 +36,20 @@ const App = () => {
 
     fetch(url)
       .then(response => response.json())
-      .then(data => console.log(data))
+      .then(data => {
+        const curSat: SatApiInfo = {
+          id: data.info.satid,
+          name: data.info.satname,
+          tle: data.tle
+        }
+        const position = getLatLngObj(curSat.tle);
+
+        const allSats = []
+        const newSat = { lat: position.lat, lng: position.lng, name: curSat.name }
+        allSats.push(newSat)
+        setSats(allSats)
+
+      })
       .catch(error => console.error('Error:', error));
   }
 
