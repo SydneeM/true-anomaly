@@ -25,19 +25,12 @@ const App = () => {
   const getSatInfo = () => {
     const apiKey = process.env.REACT_APP_N2YO_KEY
     const satId = "25544"
-    const url = "https://api.n2yo.com/rest/v1/satellite/tle/" + satId + "&apiKey=" + apiKey
+    const url = "/rest/v1/satellite/tle/" + satId + "&apiKey=" + apiKey
 
-    fetch("http://api.open-notify.org/iss-now.json")
+    fetch(url)
       .then(response => response.json())
-      .then(data => {
-        console.log(data)
-        const allSats = []
-        const newSat = { lat: data.iss_position.latitude, lng: data.iss_position.longitude, name: "iss" }
-        allSats.push(newSat)
-        setSats(allSats)
-
-      })
-      .catch(error => console.error(error));
+      .then(data => console.log(data))
+      .catch(error => console.error('Error:', error));
   }
 
   return (
