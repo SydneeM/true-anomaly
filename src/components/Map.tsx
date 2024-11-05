@@ -2,34 +2,17 @@ import React from 'react';
 import GoogleMap from 'google-maps-react-markers'
 import Marker from './Marker';
 
+interface CoordInfo {
+  lat: number;
+  lng: number;
+  name: string
+}
 
-const Map = () => {
+interface MapProps {
+  sats: CoordInfo[]
+}
 
-  interface CoordInfo {
-    lat: number;
-    lng: number;
-    name: string
-  }
-
-  const coordinates: CoordInfo[] =
-    [
-      {
-        lat: 45.4046987,
-        lng: 12.2472504,
-        name: "Venice"
-      },
-      {
-        lat: 41.9102415,
-        lng: 12.3959151,
-        name: "Rome"
-      },
-      {
-        lat: 45.4628328,
-        lng: 9.1076927,
-        name: "Milan"
-      }
-    ]
-
+const Map = (props: MapProps) => {
   return (
     <div style={{ height: '100vh', width: '100%' }}>
       <GoogleMap
@@ -39,7 +22,7 @@ const Map = () => {
         mapMinHeight="100vh"
         onChange={(map) => console.log('Map moved', map)}
       >
-        {coordinates.map(({ lat, lng, name }, index) => (
+        {props.sats.map(({ lat, lng, name }, index) => (
           <Marker
             key={index}
             lat={lat}
