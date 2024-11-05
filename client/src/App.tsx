@@ -18,6 +18,7 @@ interface CoordInfo {
 }
 
 const App = () => {
+  const [satDisplayIds, setSatDisplayIds] = useState<number[]>([25544, 61183, 26082])
   const [sats, setSats] = useState<CoordInfo[]>([])
 
   useEffect(() => {
@@ -29,28 +30,29 @@ const App = () => {
     return () => clearInterval(interval);
   }, [])
 
-  const getSatInfo = () => {
+  const getSatInfo = async () => {
     const apiKey = process.env.REACT_APP_N2YO_KEY
-    const satId = "25544"
-    const url = "/rest/v1/satellite/tle/" + satId + "&apiKey=" + apiKey
+    const urls: string[] = satDisplayIds.map((id: number) => "/rest/v1/satellite/tle/" + id + "&apiKey=" + apiKey)
 
-    fetch(url)
-      .then(response => response.json())
-      .then(data => {
+    try {
+      const responses = await Promise.all(urls.map((url: string) => fetch(url)));
+      const data = await Promise.all(responses.map((response: Response) => response.json()));
+
+      const allData = data.map((curData) => {
         const curSat: SatApiInfo = {
-          id: data.info.satid,
-          name: data.info.satname,
-          tle: data.tle
+          id: curData.info.satid,
+          name: curData.info.satname,
+          tle: curData.tle
         }
         const position = getLatLngObj(curSat.tle);
-
-        const allSats = []
-        const newSat = { lat: position.lat, lng: position.lng, name: curSat.name }
-        allSats.push(newSat)
-        setSats(allSats)
-
+        const newSat: CoordInfo = { lat: position.lat, lng: position.lng, name: curSat.name }
+        return newSat
       })
-      .catch(error => console.error('Error:', error));
+
+      setSats(allData)
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
   }
 
   return (
