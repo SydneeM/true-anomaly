@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import './App.css';
-import Map from './components/Map';
-import { getLatLngObj } from 'tle.js';
+import React, { useState, useEffect } from "react";
+import "./App.css";
+import Map from "./components/Map";
+import { getLatLngObj } from "tle.js";
 
 const REFRESH_TIME_MS = 10000
 
@@ -51,13 +51,16 @@ const App = () => {
 
       setSats(allData)
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error("Error fetching data:", error);
     }
   }
 
   return (
     <div className="App">
       <Map sats={sats} />
+      <div>
+        Hello
+      </div>
     </div>
   );
 }
