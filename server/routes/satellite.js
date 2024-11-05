@@ -13,7 +13,7 @@ router.get("/", async (req, res) => {
 
 router.get("/:id", async (req, res) => {
   let collection = await db.collection("satellites");
-  let query = { _id: new ObjectId(req.params.id) };
+  const query = { id: parseInt(req.params.id) };
   let result = await collection.findOne(query);
 
   if (!result) res.send("Not found").status(404);
@@ -38,7 +38,7 @@ router.post("/", async (req, res) => {
 
 router.patch("/:id", async (req, res) => {
   try {
-    const query = { _id: new ObjectId(req.params.id) };
+    const query = { id: parseInt(req.params.id) };
     const updates = {
       $set: {
         name: req.body.name
@@ -56,7 +56,7 @@ router.patch("/:id", async (req, res) => {
 
 router.delete("/:id", async (req, res) => {
   try {
-    const query = { _id: new ObjectId(req.params.id) };
+    const query = { id: parseInt(req.params.id) };
 
     const collection = db.collection("satellites");
     let result = await collection.deleteOne(query);
