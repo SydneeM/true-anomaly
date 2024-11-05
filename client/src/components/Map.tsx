@@ -12,6 +12,10 @@ interface MapProps {
   sats: CoordInfo[]
 }
 
+const handleMarkerClick = (name: string) => {
+  console.log("click", name)
+}
+
 const Map = (props: MapProps) => {
   return (
     <div style={{ height: "50vh", width: "100vw" }}>
@@ -27,7 +31,7 @@ const Map = (props: MapProps) => {
             lat={lat}
             lng={lng}
             markerId={name}
-          // onClick={onMarkerClick}
+            onClick={() => handleMarkerClick(name)}
           />
         ))}
       </GoogleMap>
