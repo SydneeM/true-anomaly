@@ -2,10 +2,10 @@ import React, { useState, useEffect } from "react";
 import "./App.css";
 import Map from "./components/Map";
 import DataTable from "./components/Table";
-import AddForm from "./components/AddForm";
+import Form from "./components/Form";
 import { getLatLngObj } from "tle.js";
 
-const REFRESH_TIME_MS = 5000
+const REFRESH_TIME_MS = 10000
 
 interface BasicSatInfo {
   id: number;
@@ -76,15 +76,10 @@ const App = () => {
   }, [satDisplayIds])
 
   const getTableSats = async () => {
-    console.log("GET DB")
+    console.log("GET FROM DB")
     try {
       const url: string = "http://localhost:5050/satellites"
       const response = await fetch(url);
-      if (!response.ok) {
-        const message = `An error occurred: ${response.statusText}`;
-        console.error(message);
-        return;
-      }
       const satellites: TableSatInfo[] = await response.json();
       setTableSats(satellites)
       const satIds: number[] = satellites.map((sat: TableSatInfo) => sat.id)
@@ -95,7 +90,7 @@ const App = () => {
   }
 
   const postTableSat = async (body: TableSatInfo) => {
-    console.log("POST DB")
+    console.log("POST TO DB")
     try {
       const response = await fetch("http://localhost:5050/satellites", {
         method: "POST",
@@ -104,35 +99,59 @@ const App = () => {
         },
         body: JSON.stringify(body),
       });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
     } catch (error) {
       console.error("Error adding to db:", error);
     }
   }
 
-  const handleAddSat = async (id: string) => {
-    let addedId = parseInt(id)
-    setSatDisplayIds([...satDisplayIds, addedId])
-
-    let test = []
-    test.push(addedId)
-
-    const data = await gatherFetchData(test)
-    const newData = data.map((curData) => {
-      const curSat: TableSatInfo = {
-        _id: "",
-        id: curData.info.satid,
-        name: curData.info.satname,
-        command: ""
+  const deleteTableSat = async (id: number) => {
+    console.log("DELETE FROM DB")
+    const result = tableSats.find((tableRow) => tableRow.id == id);
+    if (result) {
+      const uniqueId = result.id
+      try {
+        const response = await fetch(`http://localhost:5050/satellites/${uniqueId}`, {
+          method: "DELETE",
+        });
+        const updatedSats = tableSats.filter((curSat) => curSat.id !== uniqueId);
+        setTableSats(updatedSats);
+      } catch (error) {
+        console.error("Error deleting from db:", error);
       }
-      return curSat
-    })
+    }
+  }
 
-    setTableSats([...tableSats, newData[0]])
-    postTableSat(newData[0])
+  const handleAddSat = async (id: string) => {
+    let addId = parseInt(id)
+    const result = tableSats.find((tableRow) => tableRow.id == addId);
+    if (result) {
+      console.log("Satellite already exists")
+    } else {
+      setSatDisplayIds([...satDisplayIds, addId])
+      let newDisplayIds = []
+      newDisplayIds.push(addId)
+
+      const data = await gatherFetchData(newDisplayIds)
+      const newData = data.map((curData) => {
+        const curSat: TableSatInfo = {
+          _id: "",
+          id: curData.info.satid,
+          name: curData.info.satname,
+          command: ""
+        }
+        return curSat
+      })
+
+      setTableSats([...tableSats, newData[0]])
+      postTableSat(newData[0])
+    }
+  }
+
+  const handleDeleteSat = (id: string) => {
+    const deleteId = parseInt(id)
+    const updatedDisplayIds: number[] = satDisplayIds.filter((curId: number) => curId !== deleteId);
+    setSatDisplayIds(updatedDisplayIds)
+    deleteTableSat(deleteId)
   }
 
   return (
@@ -140,7 +159,7 @@ const App = () => {
       <Map sats={sats} />
       <div>
         <DataTable rows={tableSats} />
-        <AddForm handleAddSat={handleAddSat} />
+        <Form handleAddSat={handleAddSat} handleDeleteSat={handleDeleteSat} />
       </div>
     </div>
   );
