@@ -23,7 +23,9 @@ router.get("/:id", async (req, res) => {
 router.post("/", async (req, res) => {
   try {
     let newDocument = {
-      name: req.body.name
+      id: req.body.id,
+      name: req.body.name,
+      command: req.body.command
     };
     let collection = await db.collection("satellites");
     let result = await collection.insertOne(newDocument);
