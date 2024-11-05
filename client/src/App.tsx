@@ -51,6 +51,9 @@ const App = () => {
       try {
         const data = await gatherFetchData(satDisplayIds)
         const allData = data.map((curData) => {
+          if ("error" in curData) {
+            throw new Error(`An error occurred: ${curData.error}`)
+          }
           const curSat: MapSatInfo = {
             id: curData.info.satid,
             name: curData.info.satname,
@@ -80,6 +83,10 @@ const App = () => {
     try {
       const url: string = "http://localhost:5050/satellites"
       const response = await fetch(url);
+
+      if (!response.ok) {
+        throw new Error(`An error occurred: ${response.statusText}`)
+      }
       const satellites: TableSatInfo[] = await response.json();
       setTableSats(satellites)
       const satIds: number[] = satellites.map((sat: TableSatInfo) => sat.id)
@@ -99,6 +106,10 @@ const App = () => {
         },
         body: JSON.stringify(body),
       });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
     } catch (error) {
       console.error("Error adding to db:", error);
     }
@@ -113,6 +124,10 @@ const App = () => {
         const response = await fetch(`http://localhost:5050/satellites/${uniqueId}`, {
           method: "DELETE",
         });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
         const updatedSats = tableSats.filter((curSat) => curSat.id !== uniqueId);
         setTableSats(updatedSats);
       } catch (error) {
