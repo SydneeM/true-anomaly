@@ -41,7 +41,7 @@ router.patch("/:id", async (req, res) => {
     const query = { id: parseInt(req.params.id) };
     const updates = {
       $set: {
-        name: req.body.name
+        command: req.body.command
       },
     };
 

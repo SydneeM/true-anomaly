@@ -12,7 +12,8 @@ interface TableSatInfo extends BasicSatInfo {
 }
 
 interface DataTableProps {
-  rows: TableSatInfo[]
+  rows: TableSatInfo[];
+  handleUpdateSat: (row: TableSatInfo) => void;
 }
 
 const columns: GridColDef[] = [
@@ -22,11 +23,20 @@ const columns: GridColDef[] = [
 ];
 
 const DataTable = (props: DataTableProps) => {
+  const handleProcessRowUpdate = (newRow: any) => {
+    const updatedRows = props.rows.map(row =>
+      row.id === newRow.id ? { ...row, command: newRow.command } : row
+    );
+    props.handleUpdateSat(newRow)
+    return newRow;
+  };
+
   return (
     <Paper sx={{ height: 400, width: '100%' }}>
       <DataGrid
         rows={props.rows}
         columns={columns}
+        processRowUpdate={handleProcessRowUpdate}
         sx={{ border: 0 }}
       />
     </Paper>

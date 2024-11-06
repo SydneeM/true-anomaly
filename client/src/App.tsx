@@ -115,9 +115,29 @@ const App = () => {
     }
   }
 
+  const updateTableSat = async (body: TableSatInfo) => {
+    console.log("UPDATE IN DB", body)
+    const updateId = body.id
+    try {
+      const response = await fetch(`http://localhost:5050/satellites/${updateId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+    } catch (error) {
+      console.error("Error updating in db:", error);
+    }
+  }
+
   const deleteTableSat = async (id: number) => {
     console.log("DELETE FROM DB")
-    const result = tableSats.find((tableRow) => tableRow.id == id);
+    const result = tableSats.find((tableRow) => tableRow.id === id);
     if (result) {
       const uniqueId = result.id
       try {
@@ -138,7 +158,7 @@ const App = () => {
 
   const handleAddSat = async (id: string) => {
     let addId = parseInt(id)
-    const result = tableSats.find((tableRow) => tableRow.id == addId);
+    const result = tableSats.find((tableRow) => tableRow.id === addId);
     if (result) {
       console.log("Satellite already exists")
     } else {
@@ -169,11 +189,19 @@ const App = () => {
     deleteTableSat(deleteId)
   }
 
+  const handleUpdateSat = (row: TableSatInfo) => {
+    const updateId = row.id
+    const result = tableSats.find((tableRow) => tableRow.id === updateId);
+    if (result) {
+      updateTableSat(row)
+    }
+  }
+
   return (
     <div className="App">
       <Map sats={sats} />
       <div>
-        <DataTable rows={tableSats} />
+        <DataTable rows={tableSats} handleUpdateSat={handleUpdateSat} />
         <Form handleAddSat={handleAddSat} handleDeleteSat={handleDeleteSat} />
       </div>
     </div>
